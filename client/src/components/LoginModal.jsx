@@ -2,8 +2,30 @@ import React from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FcGoogle } from "react-icons/fc";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../lib/firebase.js";
+import axios from "axios";
+import { serverUrl } from "../App.jsx";
 
 const LoginModal = ({ open, onClose }) => {
+  const handleGoogleAuth = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google`,
+        {
+          name: result.user.displayName,
+          email: result.user.email,
+          avatar: result.user.photoURL,
+        },
+        { withCredentials: true },
+      );
+      // console.log(data)
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <AnimatePresence>
       {open && (
@@ -56,6 +78,7 @@ const LoginModal = ({ open, onClose }) => {
                 <motion.button
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.96 }}
+                  onClick={handleGoogleAuth}
                   className="group relative w-full h-13 rounded-xl bg-white text-black font-semibold shadow-xl overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-linear-to-r from-zinc-100 to-white opacity-0 group-hover:opacity-100 transition" />
