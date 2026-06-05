@@ -2,10 +2,15 @@ import React from "react";
 import { motion } from "motion/react";
 import LoginModal from "../components/LoginModal";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { Coins } from 'lucide-react'
 
 const Home = () => {
   const [openLogin, setOpenLogin] = useState(false);
-
+  const { userData } = useSelector((state) => state.user);
+  const avatarUrl = userData?.avatar;
+  const name = userData?.name;
+  // const userInitial = userData?.name?.charAt(0)?.toUpperCase() || "U";
   const highlights = [
     "Ai Generated Code",
     "Fully Responsive Layouts",
@@ -29,11 +34,37 @@ const Home = () => {
             <div className="hidden md:inline text-sm text-zinc-400 hover:text-white cursor-pointer ">
               Pricing
             </div>
-            <button
-            onClick={()=>setOpenLogin(true)}
-            className="px-4 py-2 rounded-lg border border-white/20 hover:bg-white/10 text-sm">
-              Get Started
-            </button>
+
+            {userData && <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-white/5 border border-white/10 text-sm cursor-pointer hover:bg-white/10 transition">
+              <Coins size={14} className="text-yellow-400" />
+              <span className="text-zinc-300">Credits</span>
+              <span>{userData.credits}</span>
+              <span className="font-semibold">+</span>
+              </div>}
+
+            {!userData ? (
+              <button
+                onClick={() => setOpenLogin(true)}
+                className="px-4 py-2 rounded-lg border border-white/20 hover:bg-white/10 text-sm"
+              >
+                Get Started
+              </button>
+            ) : (
+              <button className="h-10 w-10 rounded-full overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center text-sm font-semibold">
+                {avatarUrl ? (
+                  <img
+                    src={
+                      avatarUrl || `https://ui-avatars.com/api/?name=${name}`
+                    }
+                    alt={userData.name || "User avatar"}
+                    referrerPolicy="no-referrer"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  userInitial
+                )}
+              </button>
+            )}
           </div>
         </div>
       </motion.div>
@@ -60,7 +91,10 @@ const Home = () => {
           responsive site today.
         </motion.p>
 
-        <button className="mt-12 px-10 py-4 rounded-xl bg-white text-black font-semibold hover:scale-105 transition" onClick={()=>setOpenLogin(true)}>
+        <button
+          className="mt-12 px-10 py-4 rounded-xl bg-white text-black font-semibold hover:scale-105 transition"
+          onClick={() => setOpenLogin(true)}
+        >
           Get Started
         </button>
       </section>
@@ -91,9 +125,14 @@ const Home = () => {
         &copy; {new Date().getFullYear()} GenWeb.ai
       </footer>
 
-        {openLogin && <LoginModal open={openLogin} onClose={()=>{setOpenLogin(false)}} />}
-
-
+      {openLogin && (
+        <LoginModal
+          open={openLogin}
+          onClose={() => {
+            setOpenLogin(false);
+          }}
+        />
+      )}
     </div>
   );
 };

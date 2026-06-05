@@ -6,12 +6,15 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../lib/firebase.js";
 import axios from "axios";
 import { serverUrl } from "../App.jsx";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice.js";
 
 const LoginModal = ({ open, onClose }) => {
+  const dispatch = useDispatch()
   const handleGoogleAuth = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      await axios.post(
+      const {data} = await axios.post(
         `${serverUrl}/api/auth/google`,
         {
           name: result.user.displayName,
@@ -22,6 +25,7 @@ const LoginModal = ({ open, onClose }) => {
       );
       window.dispatchEvent(new Event("auth:changed"));
       onClose();
+      dispatch(setUserData(data))
     } catch (error) {
       console.log(error);
     }
