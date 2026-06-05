@@ -10,7 +10,7 @@ export const googleAuth = async (req, res) => {
         .json({ success: false, message: "Email is required" });
     }
 
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
       user = await User.create({ name, email, avatar });
     }

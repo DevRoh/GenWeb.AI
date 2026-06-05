@@ -11,7 +11,7 @@ const LoginModal = ({ open, onClose }) => {
   const handleGoogleAuth = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      const { data } = await axios.post(
+      await axios.post(
         `${serverUrl}/api/auth/google`,
         {
           name: result.user.displayName,
@@ -20,7 +20,8 @@ const LoginModal = ({ open, onClose }) => {
         },
         { withCredentials: true },
       );
-      // console.log(data)
+      window.dispatchEvent(new Event("auth:changed"));
+      onClose();
     } catch (error) {
       console.log(error);
     }
