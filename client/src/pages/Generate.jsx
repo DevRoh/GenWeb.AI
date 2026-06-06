@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
@@ -8,13 +8,27 @@ import { serverUrl } from "../App";
 const Generate = () => {
   const navigate = useNavigate();
   const [prompt,setPrompt] = useState("")
+  const [loading,setLoading] = useState(false)
+  const [error,setError] = useState("")
 
   const handleGenerateWebsite = async()=>{
+    if(!prompt.trim()) {
+      setError("Describe the website you want to build first.")
+      return
+    }
+
     try {
+      setLoading(true)
+      setError("")
       const res = await axios.post(`${serverUrl}/api/website/generate`,{prompt},{withCredentials:true})
-      console.log(res)
+      if(res.data?.websiteId) {
+        navigate(`/editor/${res.data.websiteId}`)
+      }
     } catch (error) {
       console.log(error)
+      setError(error?.response?.data?.message || "Website generation failed")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -69,15 +83,18 @@ const Generate = () => {
               className="w-full h-56 p-6 rounded-3xl bg-black/60 border border-white/10 outline-none resize-none text-sm leading-relaxed focus:ring-white/20"
             ></textarea>
           </div>
+          {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
         </div>
         <div className="flex justify-center">
             <motion.button
             onClick={handleGenerateWebsite}
+            disabled={loading}
             whileHover={{scale:1.05}}
             whileTap={{scale:0.96}}
-            className="px-14 py-4 rounded-2xl font-semibold text-lg rounded-2xl bg-white text-black hover:cursor-pointer"
+            className="px-14 py-4 min-w-60 rounded-2xl font-semibold text-lg bg-white text-black hover:cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
-                Generate Website
+                {loading && <Loader2 size={20} className="animate-spin" />}
+                {loading ? "Generating..." : "Generate Website"}
             </motion.button>
         </div>
       </div>
