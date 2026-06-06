@@ -5,23 +5,11 @@ const messageSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: ["ai", "user"],
-      requried: true,
+      required: true,
     },
     content: {
       type: String,
       required: true,
-    },
-    conversation: [messageSchema],
-    deployed: {
-      type: Boolean,
-      default: false,
-    },
-    deployedUrl: {
-      type: String,
-    },
-    slug: {
-      type: String,
-      unique: true,
     },
   },
   { timestamps: true },
@@ -42,9 +30,21 @@ const websiteSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    conversation: [messageSchema],
+    deployed: {
+      type: Boolean,
+      default: false,
+    },
+    deployedUrl: {
+      type: String,
+    },
+    slug: {
+      type: String,
+      unique: true,
+    },
   },
   { timestamps: true },
 );
 
-const Website = mongoose.model("Website",websiteSchema)
-export default Website
+const Website = mongoose.model("Website", websiteSchema);
+export default Website;
